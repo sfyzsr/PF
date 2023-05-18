@@ -42,6 +42,7 @@ class Cloud:
 
     def __post_init__(self):
         self.particles = [self.initial_particle.copy() for i in range(self.n)]
+
     def estimate(self):
         pos = []
         for p in self.particles:
@@ -49,6 +50,14 @@ class Cloud:
         pos = np.array(pos)
         mean = np.average(pos, weights=np.array(self.weights()), axis=0)
         return mean
+    
+    def estimate_xya(self):
+        pos = []
+        for p in self.particles:
+            pos.append([p.x, p.y, p.a])
+        pos = np.array(pos)
+        mean = np.average(pos, weights=np.array(self.weights()), axis=0)
+        return mean, pos
 
     def move(self, control, devs = (0, 0, 0)):
         x, y, a = control[:3]
