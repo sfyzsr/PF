@@ -1,0 +1,2 @@
+del /S .\output\*
+y

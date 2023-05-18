@@ -15,7 +15,7 @@ CPU = torch.device("cpu")
 # Code Parameters
 #######################
 SAVE_INTERVAL = 1  # save every 50 steps
-SAVE_DIR = "./viz_crf"
+SAVE_DIR = "./output/viz_crf"
 METER2PIX = 39.3701 * 72 / 100
 
 #######################
@@ -56,7 +56,7 @@ UNIFIED_SCORE_MATRIX = np.zeros([25, HEIGHT, WIDTH, NEIGHBOR])
 # MAP_IMG = np.load('map_walls_1m.npy')
 # HEAT_IMG = np.zeros([HEIGHT, WIDTH, 3], dtype=np.uint8)
 
-window = 125
+window = 25
 
 def gaussian_kernel(size = 5, sigma = 2):
     # Create an (size x size) grid of coordinates
@@ -245,14 +245,24 @@ def localization_score(localizations):
 
 def getAngle(vector_1,vector_2):
     zero = [0,0]
-    if(vector_1 ==zero):
+    if(all(vector_1) ==zero):
         return 0
-    if(vector_2 ==zero):
+    if(all(vector_2) ==zero):
         return 0
     unit_vector_1 = vector_1 / np.linalg.norm(vector_1)
     unit_vector_2 = vector_2 / np.linalg.norm(vector_2)
     dot_product = np.dot(unit_vector_1, unit_vector_2)
-    angle = np.arccos(dot_product)
+    # Handle dot product outside the valid range [-1, 1]
+    if dot_product >= -1.0 and dot_product <= 1.0:
+        angle = np.arccos(dot_product)
+    elif dot_product > 1.0:
+        angle = 0.0
+    elif dot_product < -1.0:
+        angle = np.pi
+    else:
+        # Handle other cases if necessary
+        angle = 0.0
+
     return angle
 
 def rotate (vector,angle):
@@ -262,18 +272,18 @@ def rotate (vector,angle):
     vy = vector[1]
     x = vector[0] * math.cos(angle) - vector[1] * math.sin(angle)
     y = vector[0] * math.sin(angle) + vector[1] * math.cos(angle)
-    if(x<0):
-        x = vx
-        y = vy
-    if(y<0):
-        x = vx
-        y = vy
-    if(x>5):
-        x = vx
-        y = vy
-    if(y>5):
-        x = vx
-        y = vy
+    # if(x<0):
+    #     x = vx
+    #     y = vy
+    # if(y<0):
+    #     x = vx
+    #     y = vy
+    # if(x>5):
+    #     x = vx
+    #     y = vy
+    # if(y>5):
+    #     x = vx
+    #     y = vy
     new = []
     new.append(x)
     new.append(y)
@@ -288,16 +298,21 @@ def project(a, b):
     return proj
   
 
-def correctAngle(Z,onlineWindow):
-
-    Slen = len(onlineWindow)
-    S = onlineWindow
+def correctAngle(S,Z):
+    
+    # print(Z)
+    # print("")
+    # print(S)
+    Slen = len(S)
     
     sum = 0
     for i in range(Slen-1,1,-1):
-        x = S[i] [0] - S[i-1] [0]
-        y = S[i] [1] - S[i-1] [1]
-        a = getAngle([x,y],Z[i])
+        x1 = S[i] [0] - S[i-1] [0]
+        y1 = S[i] [1] - S[i-1] [1]
+
+        x2 = Z[i] [0] - Z[i-1] [0]
+        y2 = Z[i] [1] - Z[i-1] [1]
+        a = getAngle([x1,y1],[x2,y2])
         
         sum += a
     
@@ -306,15 +321,25 @@ def correctAngle(Z,onlineWindow):
     return avg
         
 
-def score_loc2(position_old, position_new, score_last_step, score_precalculate, localizations,vec_s_list,onlineWindow):
+def score_loc2(position_old, position_new, score_last_step, score_precalculate, localizations,vec_s_list,vec_z_list):
     
-    position_delta = position_new - position_old + np.array([2, 2])
+    position_diff = position_new - position_old 
+    angle = correctAngle(vec_s_list,vec_z_list)
+    position_rotate = rotate(position_diff,angle)
+
+    position_delta = position_rotate + np.array([2, 2]) 
+
+    # position_delta = position_new - position_old + np.array([2, 2])
 
     # print("aaa")
     # print(position_delta)
-    angle = correctAngle(vec_s_list,onlineWindow)
-    position_delta = rotate(position_delta,angle)
+    # angle = correctAngle(vec_s_list,onlineWindow)
+    # position_delta = rotate(position_delta,angle)
+    # print(vec_s_list)
+    # print(vec_z_list)
+    # print(angle)
     # print(position_delta)
+
     idx = np.ravel_multi_index(position_delta, [5, 5])
 
     # score_last_step = np.repeat(score_last_step[:,:,np.newaxis], NEIGHBOR, axis=2)
@@ -331,15 +356,24 @@ def score_loc2(position_old, position_new, score_last_step, score_precalculate, 
     # score_traceback = torch.argmax(score_viterbi, dim=2)  # shape (HEIGHT, WIDTH), value from 0 to 24
     return score_this_step, score_traceback
 
+# vec_s_list: trace estimated position in window
+# vec_z_list: window lenghth inertial trajectory list 
+def score2(position_old, position_new, score_last_step, score_precalculate,vec_s_list,vec_z_list):
+    
+    position_diff = position_new - position_old 
+    angle = correctAngle(vec_s_list,vec_z_list)
+    position_rotate = rotate(position_diff,angle)
 
-def score2(position_old, position_new, score_last_step, score_precalculate,vec_s_list,onlineWindow):
-    position_delta = position_new - position_old + np.array([2, 2])
+    position_delta = position_rotate + np.array([2, 2]) 
 
-
-    angle = correctAngle(vec_s_list,onlineWindow)
-    position_delta = rotate(position_delta,angle)
+    # position_delta = position_new - position_old + np.array([2, 2]) # here change the position vector to the grid
+    # print(position_diff)
+    # print(position_delta)
+    # print("score2")
+    # print(position_delta)
 
     # access reverse
+    # get the index of table by the ravel_multi_index -- go check the ravel_multi_index def
     idx = np.ravel_multi_index(position_delta, [5, 5])
     # score_last_step = np.repeat(score_last_step[:,:,np.newaxis], NEIGHBOR, axis=2)
     score_last_step = score_last_step.unsqueeze(2).repeat(1, 1, NEIGHBOR)
@@ -476,18 +510,21 @@ def main():
             vec_s_list = trace[-window:]
             onlineWindow = online[-window:]
 
+            vec_z_list = mega_trajectory[i-window:i+1]
+            # vec_z_list = mega_trajectory[i-window:i+1]
+
             # print(vec_s_list)
             # print(onlineWindow)
             position_old = mega_trajectory[i]
             position_new = mega_trajectory[i + 1]
             if not localization_bool[i+1]:
                 score_matrix, traceback_matrix = score2(
-                position_old, position_new, score_matrix, score_precalculate,vec_s_list,onlineWindow
+                position_old, position_new, score_matrix, score_precalculate,vec_s_list,vec_z_list
             )
             else:
                 # seem like when located in the right position get higher marks ?
                 score_matrix, traceback_matrix = score_loc2(
-                    position_old, position_new, score_matrix, score_precalculate, localization[i+1],vec_s_list,onlineWindow
+                    position_old, position_new, score_matrix, score_precalculate, localization[i+1],vec_s_list,vec_z_list
                 )
         else:
 
@@ -529,7 +566,7 @@ def main():
             # np.save(os.path.join(SAVE_DIR, trace_file_name), score_all_steps)
             # score_all_steps = []
             # visualize(MAP_IMG_COPY, os.path.join(SAVE_DIR, viz_file_name))
-            # visualize(MAP_IMG_COPY, i, np.array(online), trace, gt_seq, localization, os.path.join(SAVE_DIR, viz_file_name))
+            visualize(MAP_IMG_COPY, i, np.array(online), trace, gt_seq, localization, os.path.join(SAVE_DIR, viz_file_name))
             # visualize(MAP_IMG_COPY, GRAPH_IMG, os.path.join(SAVE_DIR, viz_file_name))
             torch.cuda.empty_cache()
 
@@ -594,7 +631,7 @@ def main():
 def visualize(img1, i, online, trace, gt_seq, localization, name):
     plt.rcParams["figure.figsize"] = (10,8)
     f, axarr = plt.subplots(1, 1)
-    plt.imshow(img1, alpha=0.3)
+    plt.imshow(img1.astype('uint8'), alpha=0.3)
     plt.plot(gt_seq[:i//2+1, 0]*METER2PIX, -gt_seq[:i//2+1, 1]*METER2PIX, c='deepskyblue', alpha=0.5, label='GT history')
     plt.scatter(gt_seq[i//2, 0]*METER2PIX, -gt_seq[i//2, 1]*METER2PIX, c='mediumblue', s=20, label='GT now')
     plt.plot(trace[:, 1]*10, trace[:, 0]*10, c='magenta', alpha=0.5, label='offline trajectory')
