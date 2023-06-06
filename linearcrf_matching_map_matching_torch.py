@@ -15,8 +15,10 @@ CPU = torch.device("cpu")
 # Code Parameters
 #######################
 SAVE_INTERVAL = 1  # save every 50 steps
-SAVE_DIR = "./output/viz_crf"
+SAVE_DIR = "./output/viz_crf_35"
 METER2PIX = 39.3701 * 72 / 100
+
+window = 35
 
 #######################
 # Model Parameters
@@ -56,7 +58,7 @@ UNIFIED_SCORE_MATRIX = np.zeros([25, HEIGHT, WIDTH, NEIGHBOR])
 # MAP_IMG = np.load('map_walls_1m.npy')
 # HEAT_IMG = np.zeros([HEIGHT, WIDTH, 3], dtype=np.uint8)
 
-window = 25
+
 
 def gaussian_kernel(size = 5, sigma = 2):
     # Create an (size x size) grid of coordinates
@@ -249,8 +251,15 @@ def getAngle(vector_1,vector_2):
         return 0
     if(all(vector_2) ==zero):
         return 0
-    unit_vector_1 = vector_1 / np.linalg.norm(vector_1)
-    unit_vector_2 = vector_2 / np.linalg.norm(vector_2)
+    norm_1 = np.linalg.norm(vector_1)
+    norm_2 = np.linalg.norm(vector_2)
+
+    if norm_1 == 0 or norm_2 == 0:
+        return 0
+
+    unit_vector_1 = vector_1 / norm_1
+    unit_vector_2 = vector_2 / norm_2
+
     dot_product = np.dot(unit_vector_1, unit_vector_2)
     # Handle dot product outside the valid range [-1, 1]
     if dot_product >= -1.0 and dot_product <= 1.0:

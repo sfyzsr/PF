@@ -27,7 +27,7 @@ def create_video_from_images(image_folder, output_path, fps):
     print("Video created successfully.")
 
 # Example usage
-image_folder_path = './output/viz_crf'
+image_folder_path = './output/viz_crf_35'
 output_video_path = './output/video/video.mp4'
 fps = 10  # Frames per second
 
