@@ -1,4 +1,8 @@
-
+SAVE_DIR = "newLinearCRF/output/viz_crf_nomap_20"
+import os
+if not os.path.exists(SAVE_DIR):
+    os.makedirs(SAVE_DIR)
+    print("Directory created:", SAVE_DIR)
 
 WIDTH = 238
 HEIGHT = 168

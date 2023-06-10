@@ -13,14 +13,18 @@ import CRF_utils
 DEVICE = torch.device("cuda")
 CPU = torch.device("cpu")
 
+DEVICE=CPU
+
 #######################
 # Code Parameters
 #######################
 SAVE_INTERVAL = 1  # save every 50 steps
-SAVE_DIR = "../output/viz_crf_35"
+SAVE_DIR = CONSTANT.SAVE_DIR
 METER2PIX = 39.3701 * 72 / 100
 
-window = 35
+window = 20
+# useWindow = False
+useWindow = True
 
 #######################
 # Model Parameters
@@ -161,6 +165,21 @@ def init_unified(map_transition, map_unary):
     )
     return score_precalculate
 
+def init_unified_without_map():
+    # init score grids for map
+    # map constraint
+    # map_transition = np.repeat(map_transition[np.newaxis, :, :, :], 25, axis=0)
+    # wall constraint
+    # map_unary = np.repeat(map_unary[np.newaxis, :, :, :], 25, axis=0)
+    score_precalculate = (
+        # WEIGHT_TRANSITION  # score for map obstacles
+        # + WEIGHT_UNARY +  # score for out-of-building
+        WEIGHT_HEADING * HEADING_MATRIX # score for heading
+        + WEIGHT_DISTANCE * DISTANCE_MATRIX # score for distance
+        + BIAS_DISTANCE # constant bias
+    )
+    return score_precalculate
+
 
 def index_to_coordinate(position, index):
     # x = index % NEIGHBOR_LENGTH
@@ -214,7 +233,10 @@ def main():
     # SEQ_LENGTH = 100
     init_heading()
     init_distance()
-    score_precalculate = init_unified(map_transition, map_unary)
+    # score_precalculate = init_unified(map_transition, map_unary)
+    score_precalculate = init_unified_without_map()
+    # print(score_precalculate)
+    
     score_precalculate = torch.from_numpy(score_precalculate).to(DEVICE)
 
     # init visualization
@@ -232,7 +254,7 @@ def main():
     print("Starting Forward Operations")
     for i in tqdm(range(SEQ_LENGTH - 1)):
 
-        if(i>window):
+        if(i>window and useWindow == True):
             start = np.unravel_index(score_matrix.argmax().to(CPU), score_matrix.shape)
             traceback_matrices = traceback_all_steps.copy()
             trace = traceback(traceback_matrices, start)
@@ -246,6 +268,8 @@ def main():
 
             # print(vec_s_list)
             # print(onlineWindow)
+            # print("hello")
+            # quit()
             position_old = mega_trajectory[i]
             position_new = mega_trajectory[i + 1]
             if not localization_bool[i+1]:

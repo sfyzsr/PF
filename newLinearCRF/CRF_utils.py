@@ -9,6 +9,8 @@ import time
 
 import CONSTANT
 DEVICE = torch.device("cuda")
+CPU = torch.device("cpu")
+DEVICE=CPU
 def gaussian_kernel(size = 5, sigma = 2):
     # Create an (size x size) grid of coordinates
     x, y = np.mgrid[-(size // 2):(size // 2) + 1, -(size // 2):(size // 2) + 1]
@@ -269,3 +271,5 @@ def score(position_old, position_new, score_last_step, score_precalculate):
     )  # shape (HEIGHT, WIDTH), value is float score
     # score_traceback = torch.argmax(score_viterbi, dim=2)  # shape (HEIGHT, WIDTH), value from 0 to 24
     return score_this_step, score_traceback
+
+

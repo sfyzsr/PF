@@ -1,6 +1,7 @@
 import cv2
 import os
-
+import CONSTANT
+import time
 def create_video_from_images(image_folder, output_path, fps):
     image_files = sorted([f for f in os.listdir(image_folder) if f.endswith('.jpg') or f.endswith('.png')])
     if not image_files:
@@ -27,8 +28,9 @@ def create_video_from_images(image_folder, output_path, fps):
     print("Video created successfully.")
 
 # Example usage
-image_folder_path = './output/viz_crf_35'
-output_video_path = './output/video/video.mp4'
+image_folder_path = CONSTANT.SAVE_DIR
+number = image_folder_path.split("_")[-1]
+output_video_path = 'newLinearCRF/video/' + 'window'+number+"_"+str(time.time())+'.mp4'
 fps = 10  # Frames per second
 
 create_video_from_images(image_folder_path, output_video_path, fps)
