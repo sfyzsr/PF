@@ -200,25 +200,25 @@ def traceback(traceback_matrices, position):
         # print("now position", position)
     return trace
 
-
+dataDir = "newLinearCRF\\data\\"
 def main():
     # read data
-    mega_trajectory = np.load(
+    mega_trajectory = np.load( dataDir +
         "trajectory_discrete.npy"
     )  # shape (SEQ_LENGTH, 2), [y, x], top-left origin 
     # (575, 2)
-    map_transition = np.load(
+    map_transition = np.load( dataDir +
         "map_transition.npy"
     )  # shape (HEIGHT, WIDTH, NEIGHBOR), value 0 or 1, 1 for obstacle
     # (168, 238, 25)
-    map_unary = np.load(
+    map_unary = np.load( dataDir +
         "map_unary.npy"
     )  # shape (HEIGHT, WIDTH, NEIGHBOR), values 0 or 1, 1 for outside of the floor plan
-    localization = np.load(
+    localization = np.load( dataDir +
         "localization.npy"
     )  # shape (SEQ_LENGTH, 5, 2), [y, x], top-left origin
     # (574, 5, 2)
-    localization_bool = np.load(
+    localization_bool = np.load( dataDir +
         "localization_bool.npy"
     )  # shape (SEQ_LENGTH, ), bool
     # (575,)
@@ -244,9 +244,9 @@ def main():
     # skeleton = np.load("skeleton_1m_v2.npy")
     # for i in skeleton:
     #     GRAPH_IMG = cv.circle(GRAPH_IMG, [i[1], i[0]], 1, [150, 150, 150], 1)
-    MAP_IMG = np.load("map_original.npy")[:, :, 0]
+    MAP_IMG = np.load(dataDir +"map_original.npy")[:, :, 0]
     MAP_IMG = np.repeat(MAP_IMG[:, :, np.newaxis], 3, axis=2)
-    gt_seq = np.load("23_gt.npy")
+    gt_seq = np.load(dataDir +"23_gt.npy")
 
     online = []
 
