@@ -200,7 +200,7 @@ def traceback(traceback_matrices, position):
         # print("now position", position)
     return trace
 
-dataDir = "newLinearCRF\\data\\"
+dataDir = "newLinearCRF/data/"
 def main():
     # read data
     mega_trajectory = np.load( dataDir +
@@ -263,7 +263,7 @@ def main():
             vec_s_list = trace[-window:]
             onlineWindow = online[-window:]
 
-            vec_z_list = mega_trajectory[i-window:i+1]
+            vec_z_list = mega_trajectory[i-window:i]
             # vec_z_list = mega_trajectory[i-window:i+1]
 
             # print(vec_s_list)
@@ -321,7 +321,11 @@ def main():
             # np.save(os.path.join(SAVE_DIR, trace_file_name), score_all_steps)
             # score_all_steps = []
             # visualize(MAP_IMG_COPY, os.path.join(SAVE_DIR, viz_file_name))
-            visualize(MAP_IMG_COPY, i, np.array(online), trace, gt_seq, localization, os.path.join(SAVE_DIR, viz_file_name))
+            try:
+                visualize(MAP_IMG_COPY, i, np.array(online), trace, gt_seq, localization, os.path.join(SAVE_DIR, viz_file_name))
+            except IndexError:
+                print(f"Index {i // 2} is out of bounds for gt_seq. Exiting the loop.")
+                break
             # visualize(MAP_IMG_COPY, GRAPH_IMG, os.path.join(SAVE_DIR, viz_file_name))
             torch.cuda.empty_cache()
 
@@ -364,24 +368,25 @@ def main():
     print("Mean L2 distance:", mean_l2)
     print("Accuracy:", accuracy)
 
-    np.save("trace.npy", trace)
-    np.save("online.npy", online)
+    np.save(SAVE_DIR+"trace.npy", trace)
+    np.save(SAVE_DIR+"online.npy", online)
 
-    plt.plot(trace[:, 0]*10, trace[:, 1]*10, 'b', label='Trace')
-    plt.plot(online[:, 0]*10, online[:, 1]*10, 'r', label='Online')
-    gt_seq[:, 0] /= 2
-    # gt_seq[:, 0] += 1
-    # plt.plot(gt_seq[:, 0]*METER2PIX, gt_seq[:, 1]*METER2PIX, 'k', label='gt')
-    plt.legend()
-    plt.xlabel('X')
-    plt.ylabel('Y') 
+    # plt.plot(trace[:, 0]*10, trace[:, 1]*10, 'b', label='Trace')
+    # plt.plot(online[:, 0]*10, online[:, 1]*10, 'r', label='Online')
+    # gt_seq[:, 0] /= 2
+    # # gt_seq[:, 0] += 1
+    # # plt.plot(gt_seq[:, 0]*METER2PIX, gt_seq[:, 1]*METER2PIX, 'k', label='gt')
+    # plt.legend()
+    # plt.xlabel('X')
+    # plt.ylabel('Y') 
     
-    plt.savefig("output/trace and online_"+str(current_time)+".png", dpi=150)
-    plt.show()
+    # plt.savefig("newLinearCRF/temp/window "+str(window)+".png", dpi=150)
+    # plt.show()
 
     # scores = np.array(score_all_steps)
     # np.save('score.npy', scores)
-
+    # visualize(MAP_IMG_COPY, i, np.array(online), trace, gt_seq[:, 1], localization, "newLinearCRF/temp/window "+str(window)+".png")
+            
 
 def visualize(img1, i, online, trace, gt_seq, localization, name):
     plt.rcParams["figure.figsize"] = (10,8)
