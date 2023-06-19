@@ -112,20 +112,9 @@ def rotate (vector,angle):
     # print(angle)
     vx = vector[0]
     vy = vector[1]
-    x = vector[0] * math.cos(angle) - vector[1] * math.sin(angle)
+    x = vector[0] * math.cos(angle) + vector[1] * math.sin(angle)
     y = vector[0] * math.sin(angle) + vector[1] * math.cos(angle)
-    # if(x<0):
-    #     x = vx
-    #     y = vy
-    # if(y<0):
-    #     x = vx
-    #     y = vy
-    # if(x>5):
-    #     x = vx
-    #     y = vy
-    # if(y>5):
-    #     x = vx
-    #     y = vy
+
     new = []
     new.append(x)
     new.append(y)
@@ -148,12 +137,14 @@ def correctAngle(S,Z):
     Slen = len(S)
     
     sum = 0
-    for i in range(Slen-1,1,-1):
+    for i in range(1,Slen):
         x1 = S[i] [0] - S[i-1] [0]
         y1 = S[i] [1] - S[i-1] [1]
 
         x2 = Z[i] [0] - Z[i-1] [0]
         y2 = Z[i] [1] - Z[i-1] [1]
+        # x2 = Z[i] [0]
+        # y2 = Z[1] [1]
         a = getAngle([x1,y1],[x2,y2])
         
         sum += a
@@ -161,8 +152,14 @@ def correctAngle(S,Z):
     avg = sum/Slen
     # print(avg)
     return avg
-        
 
+# position old: inertial old
+# position new: inertial new
+# score_last_step: score matrix
+# score_precalculate: score map matrix
+# localizations: wifi localization
+# vec_s_list: estimate window trace
+# vec_z_lsit: inertial window list
 def score_loc2(position_old, position_new, score_last_step, score_precalculate, localizations,vec_s_list,vec_z_list):
     
     position_diff = position_new - position_old 
@@ -272,4 +269,9 @@ def score(position_old, position_new, score_last_step, score_precalculate):
     # score_traceback = torch.argmax(score_viterbi, dim=2)  # shape (HEIGHT, WIDTH), value from 0 to 24
     return score_this_step, score_traceback
 
-
+# x = [0,5]
+# y = [5,0]
+# ang = getAngle(x,y)
+# print(ang)
+# new = rotate(x,ang)
+# print(new)

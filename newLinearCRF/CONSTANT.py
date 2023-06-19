@@ -1,4 +1,4 @@
-SAVE_DIR = "newLinearCRF/output/viz_crf_nomap_new_20"
+SAVE_DIR = "newLinearCRF/output/viz_crf_nomap_rotateInterval3_1-05_36"
 import os
 if not os.path.exists(SAVE_DIR):
     os.makedirs(SAVE_DIR)
@@ -16,8 +16,10 @@ SEQ_LENGTH = 10000
 #######################
 WEIGHT_TRANSITION = -9.0
 WEIGHT_UNARY = -0.3
-WEIGHT_HEADING = 0.8
-WEIGHT_DISTANCE = -0.6
+# 0.8 -0.6
+WEIGHT_HEADING = 1
+WEIGHT_DISTANCE = -0.8
+
 WEIGHT_LOC = 20.0
-BIAS_DISTANCE = 1.0
+BIAS_DISTANCE = 1
 HEADING_FILLNA = 0.0  # what value to fill NaN values in heading scores
