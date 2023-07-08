@@ -6,6 +6,7 @@ import time
 image_folder_path = CONSTANT.SAVE_DIR
 number = image_folder_path.split("_")[-1]
 output_video_path = 'newLinearCRF/video/' + 'window'+number+"_"+str(time.time())+'.mp4'
+# output_video_path = 'newLinearCRF/video/' +"_"+str(time.time())+'.mp4'
 fps = 10  # Frames per second
 
 
@@ -41,6 +42,8 @@ def create_video_from_images(image_folder, output_path, fps):
 
     # Open the destination file in binary mode for writing
     with open("newLinearCRF/last/win"+str(number)+" "+str(time.time())+" .png", 'wb') as destination_file:
+
+    # with open("newLinearCRF/last/"+" "+str(time.time())+" .png", 'wb') as destination_file:
         # Write the contents to the destination file
         destination_file.write(file_data)
 

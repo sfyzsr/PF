@@ -18,11 +18,11 @@ DEVICE=CPU
 #######################
 # Code Parameters
 #######################
-SAVE_INTERVAL = 20  # save every 50 steps
+SAVE_INTERVAL = 1  # save every 50 steps
 SAVE_DIR = CONSTANT.SAVE_DIR
 METER2PIX = 39.3701 * 72 / 100
 
-window = 36
+window = 35
 # useWindow = False
 useWindow = True
 
@@ -234,8 +234,8 @@ def main():
     # SEQ_LENGTH = 100
     init_heading()
     init_distance()
-    # score_precalculate = init_unified(map_transition, map_unary)
-    score_precalculate = init_unified_without_map()
+    score_precalculate = init_unified(map_transition, map_unary)
+    # score_precalculate = init_unified_without_map()
     # print(score_precalculate)
     
     score_precalculate = torch.from_numpy(score_precalculate).to(DEVICE)
@@ -258,7 +258,7 @@ def main():
     print("Starting Forward Operations")
     for i in tqdm(range(SEQ_LENGTH - 1)):
 
-        if(i>window and useWindow == True):
+        if(i>200 and useWindow == True):
             start = np.unravel_index(score_matrix.argmax().to(CPU), score_matrix.shape)
             traceback_matrices = traceback_all_steps.copy()
             trace = traceback(traceback_matrices, start)
@@ -271,37 +271,49 @@ def main():
             vec_z_list = mega_trajectory[i-window:i]
             # vec_z_list = mega_trajectory[i-window:i+1]
 
+            if not localization_bool[i+1]:
+                score_matrix, traceback_matrix = CRF_utils.score2(
+                position_old, position_new, score_matrix, score_precalculate,vec_s_list,vec_z_list
+            )
+            else:
+                # seem like when located in the right position get higher marks ?
+                score_matrix, traceback_matrix = CRF_utils.score_loc2(
+                    position_old, position_new, score_matrix, score_precalculate, localization[i+1],vec_s_list,vec_z_list
+                )
+            rotateFlag = 0
+
+
             # print(vec_s_list)
             # print(onlineWindow)
             # print("hello")
             # quit()
              
-            rotateFlag = rotateFlag + 1
-            position_old = mega_trajectory[i]
-            position_new = mega_trajectory[i + 1]
+            # rotateFlag = rotateFlag + 1
+            # position_old = mega_trajectory[i]
+            # position_new = mega_trajectory[i + 1]
 
-            if rotateFlag == 10: 
-            # do the rotate
-                if not localization_bool[i+1]:
-                    score_matrix, traceback_matrix = CRF_utils.score2(
-                    position_old, position_new, score_matrix, score_precalculate,vec_s_list,vec_z_list
-                )
-                else:
-                    # seem like when located in the right position get higher marks ?
-                    score_matrix, traceback_matrix = CRF_utils.score_loc2(
-                        position_old, position_new, score_matrix, score_precalculate, localization[i+1],vec_s_list,vec_z_list
-                    )
-                rotateFlag = 0
-            else:
-                if not localization_bool[i+1]:
-                    score_matrix, traceback_matrix = CRF_utils.score(
-                    position_old, position_new, score_matrix, score_precalculate
-                )
-                else:
-                    # seem like when located in the right position get higher marks ?
-                    score_matrix, traceback_matrix = CRF_utils.score_loc(
-                        position_old, position_new, score_matrix, score_precalculate, localization[i+1]
-                    )
+            # if rotateFlag == 10: 
+            # # do the rotate
+            #     if not localization_bool[i+1]:
+            #         score_matrix, traceback_matrix = CRF_utils.score2(
+            #         position_old, position_new, score_matrix, score_precalculate,vec_s_list,vec_z_list
+            #     )
+            #     else:
+            #         # seem like when located in the right position get higher marks ?
+            #         score_matrix, traceback_matrix = CRF_utils.score_loc2(
+            #             position_old, position_new, score_matrix, score_precalculate, localization[i+1],vec_s_list,vec_z_list
+            #         )
+            #     rotateFlag = 0
+            # else:
+            #     if not localization_bool[i+1]:
+            #         score_matrix, traceback_matrix = CRF_utils.score(
+            #         position_old, position_new, score_matrix, score_precalculate
+            #     )
+            #     else:
+            #         # seem like when located in the right position get higher marks ?
+            #         score_matrix, traceback_matrix = CRF_utils.score_loc(
+            #             position_old, position_new, score_matrix, score_precalculate, localization[i+1]
+            #         )
         else:
 
             position_old = mega_trajectory[i]

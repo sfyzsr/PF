@@ -1,4 +1,4 @@
-SAVE_DIR = "newLinearCRF/output/viz_crf_nomap_rotateInterval3_1-05_36"
+SAVE_DIR = "newLinearCRF/output/win_35"
 import os
 if not os.path.exists(SAVE_DIR):
     os.makedirs(SAVE_DIR)
