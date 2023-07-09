@@ -141,16 +141,27 @@ def correctAngle(S,Z):
     S_vec = covertToVectorList(S)
     Z_vec = covertToVectorList(Z)
     sum = 0
-    for i in range(1,len(S_vec)):
-        x1 = S_vec[i] [0] - S_vec[i-1] [0]
-        y1 = S_vec[i] [1] - S_vec[i-1] [1]
+    # for i in range(1,len(S_vec)):
+    #     x1 = S_vec[i] [0] - S_vec[i-1] [0]
+    #     y1 = S_vec[i] [1] - S_vec[i-1] [1]
 
-        x2 = Z_vec[i] [0] 
-        y2 = Z_vec[i] [1] 
+    #     x2 = Z_vec[i] [0] 
+    #     y2 = Z_vec[i] [1] 
+
+    #     a = getAngle([x1,y1],[x2,y2])
+    #     sum += a
+    # avg = sum/len(S_vec)
+
+    for i in range(1,len(S)):
+        x1 = S[i] [0] - S[i-1] [0]
+        y1 = S[i] [1] - S[i-1] [1]
+
+        x2 = Z[i] [0] 
+        y2 = Z[i] [1] 
 
         a = getAngle([x1,y1],[x2,y2])
         sum += a
-    avg = sum/len(S_vec)
+    avg = sum/len(S)
     # print(Z)
     # print("")
     # print(S)
