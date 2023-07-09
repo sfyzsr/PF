@@ -271,6 +271,8 @@ def main():
             vec_z_list = mega_trajectory[i-window:i]
             # vec_z_list = mega_trajectory[i-window:i+1]
             # vec_z_list = onlineWindow
+            position_old = mega_trajectory[i]
+            position_new = mega_trajectory[i + 1]
             
             if not localization_bool[i+1]:
                 score_matrix, traceback_matrix = CRF_utils.score2(
