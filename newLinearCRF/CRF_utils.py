@@ -150,7 +150,7 @@ def correctAngle(S,Z):
 
         a = getAngle([x1,y1],[x2,y2])
         sum += a
-    
+    avg = sum/len(S_vec)
     # print(Z)
     # print("")
     # print(S)
@@ -166,7 +166,7 @@ def correctAngle(S,Z):
     #     a = getAngle([x1,y1],[x2,y2])
     #     sum += a
     
-    avg = sum/len(S)
+    
     # print(avg)
     return avg
 
