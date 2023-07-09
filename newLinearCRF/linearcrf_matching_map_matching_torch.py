@@ -272,17 +272,30 @@ def main():
             # vec_z_list = mega_trajectory[i-window:i+1]
             vec_z_list = onlineWindow
 
-            if not localization_bool[i+1]:
-                score_matrix, traceback_matrix = CRF_utils.score2(
-                position_old, position_new, score_matrix, score_precalculate,vec_s_list,vec_z_list
-            )
-            else:
-                # seem like when located in the right position get higher marks ?
-                score_matrix, traceback_matrix = CRF_utils.score_loc2(
-                    position_old, position_new, score_matrix, score_precalculate, localization[i+1],vec_s_list,vec_z_list
+            if(len(vec_z_list)>=window):
+                if not localization_bool[i+1]:
+                    score_matrix, traceback_matrix = CRF_utils.score2(
+                    position_old, position_new, score_matrix, score_precalculate,vec_s_list,vec_z_list
                 )
-            rotateFlag = 0
+                else:
+                    # seem like when located in the right position get higher marks ?
+                    score_matrix, traceback_matrix = CRF_utils.score_loc2(
+                        position_old, position_new, score_matrix, score_precalculate, localization[i+1],vec_s_list,vec_z_list
+                    )
 
+            else:
+                position_old = mega_trajectory[i]
+                position_new = mega_trajectory[i + 1]
+                if not localization_bool[i+1]:
+                    score_matrix, traceback_matrix = CRF_utils.score(
+                    position_old, position_new, score_matrix, score_precalculate
+                )
+                else:
+                    # seem like when located in the right position get higher marks ?
+                    score_matrix, traceback_matrix = CRF_utils.score_loc(
+                        position_old, position_new, score_matrix, score_precalculate, localization[i+1]
+                    )               
+            # rotateFlag = 0
 
             # print(vec_s_list)
             # print(onlineWindow)

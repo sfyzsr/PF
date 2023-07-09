@@ -165,19 +165,7 @@ def score_loc2(position_old, position_new, score_last_step, score_precalculate, 
     position_diff = position_new - position_old 
     angle = correctAngle(vec_s_list,vec_z_list)
     position_rotate = rotate(position_diff,angle)
-
     position_delta = position_rotate + np.array([2, 2]) 
-
-    # position_delta = position_new - position_old + np.array([2, 2])
-
-    # print("aaa")
-    # print(position_delta)
-    # angle = correctAngle(vec_s_list,onlineWindow)
-    # position_delta = rotate(position_delta,angle)
-    # print(vec_s_list)
-    # print(vec_z_list)
-    # print(angle)
-    # print(position_delta)
 
     idx = np.ravel_multi_index(position_delta, [5, 5])
 
