@@ -22,7 +22,7 @@ SAVE_INTERVAL = 1  # save every 50 steps
 SAVE_DIR = CONSTANT.SAVE_DIR
 METER2PIX = 39.3701 * 72 / 100
 
-window = 35
+window = 20
 # useWindow = False
 useWindow = True
 
@@ -268,8 +268,9 @@ def main():
             vec_s_list = trace[-window:]
             onlineWindow = online[-window:]
 
-            vec_z_list = mega_trajectory[i-window:i]
+            # vec_z_list = mega_trajectory[i-window:i]
             # vec_z_list = mega_trajectory[i-window:i+1]
+            vec_z_list = onlineWindow
 
             if not localization_bool[i+1]:
                 score_matrix, traceback_matrix = CRF_utils.score2(
