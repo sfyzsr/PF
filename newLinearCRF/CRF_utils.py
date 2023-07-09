@@ -128,28 +128,45 @@ def project(a, b):
     proj = np.dot(a, b) / np.linalg.norm(b)**2 * b
     return proj
   
+def covertToVectorList(S):
+    ret = []
+    for i in range(1,len(S)):
+        x = S[i] [0] - S[i-1] [0]
+        y = S[i] [1] - S[i-1] [1]
+        ret.append((x,y))
+    return ret
 
 def correctAngle(S,Z):
+
+    S_vec = covertToVectorList(S)
+    Z_vec = covertToVectorList(Z)
+    sum = 0
+    for i in range(1,len(S_vec)):
+        x1 = S_vec[i] [0] - S_vec[i-1] [0]
+        y1 = S_vec[i] [1] - S_vec[i-1] [1]
+
+        x2 = Z_vec[i] [0] 
+        y2 = Z_vec[i] [1] 
+
+        a = getAngle([x1,y1],[x2,y2])
+        sum += a
     
     # print(Z)
     # print("")
     # print(S)
-    Slen = len(S)
+    # Slen = len(S)
+    # sum = 0
+    # for i in range(1,Slen):
+    #     x1 = S[i] [0] - S[i-1] [0]
+    #     y1 = S[i] [1] - S[i-1] [1]
+    #     x2 = Z[i] [0] - Z[i-1] [0]
+    #     y2 = Z[i] [1] - Z[i-1] [1]
+    #     # x2 = Z[i] [0]
+    #     # y2 = Z[1] [1]
+    #     a = getAngle([x1,y1],[x2,y2])
+    #     sum += a
     
-    sum = 0
-    for i in range(1,Slen):
-        x1 = S[i] [0] - S[i-1] [0]
-        y1 = S[i] [1] - S[i-1] [1]
-
-        x2 = Z[i] [0] - Z[i-1] [0]
-        y2 = Z[i] [1] - Z[i-1] [1]
-        # x2 = Z[i] [0]
-        # y2 = Z[1] [1]
-        a = getAngle([x1,y1],[x2,y2])
-        
-        sum += a
-    
-    avg = sum/Slen
+    avg = sum/len(S)
     # print(avg)
     return avg
 
@@ -193,11 +210,6 @@ def score2(position_old, position_new, score_last_step, score_precalculate,vec_s
 
     position_delta = position_rotate + np.array([2, 2]) 
 
-    # position_delta = position_new - position_old + np.array([2, 2]) # here change the position vector to the grid
-    # print(position_diff)
-    # print(position_delta)
-    # print("score2")
-    # print(position_delta)
 
     # access reverse
     # get the index of table by the ravel_multi_index -- go check the ravel_multi_index def
@@ -257,9 +269,9 @@ def score(position_old, position_new, score_last_step, score_precalculate):
     # score_traceback = torch.argmax(score_viterbi, dim=2)  # shape (HEIGHT, WIDTH), value from 0 to 24
     return score_this_step, score_traceback
 
-# x = [0,5]
-# y = [5,0]
-# ang = getAngle(x,y)
-# print(ang)
-# new = rotate(x,ang)
-# print(new)
+x = [0,5]
+y = [5,0]
+ang = getAngle(x,y)
+print(ang)
+new = rotate(x,ang)
+print(new)
