@@ -1,4 +1,4 @@
-SAVE_DIR = "newLinearCRF/output/win_20"
+SAVE_DIR = "newLinearCRF/output/win_10"
 import os
 if not os.path.exists(SAVE_DIR):
     os.makedirs(SAVE_DIR)

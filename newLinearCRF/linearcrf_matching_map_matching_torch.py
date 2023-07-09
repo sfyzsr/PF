@@ -22,7 +22,7 @@ SAVE_INTERVAL = 1  # save every 50 steps
 SAVE_DIR = CONSTANT.SAVE_DIR
 METER2PIX = 39.3701 * 72 / 100
 
-window = 20
+window = 10
 # useWindow = False
 useWindow = True
 
@@ -258,7 +258,7 @@ def main():
     print("Starting Forward Operations")
     for i in tqdm(range(SEQ_LENGTH - 1)):
 
-        if(i>200 and useWindow == True):
+        if(i>100 and useWindow == True):
             start = np.unravel_index(score_matrix.argmax().to(CPU), score_matrix.shape)
             traceback_matrices = traceback_all_steps.copy()
             trace = traceback(traceback_matrices, start)
